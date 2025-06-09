@@ -27,6 +27,8 @@
 
 import pandas as pd ## untuk memproses file dataset .CSV
 import numpy as np ## untuk perhitungan
+from collections import Counter
+import math
 import matplotlib.pyplot as plt ## untuk visualisasi data mungkin?
 
 
@@ -50,33 +52,58 @@ def preprocessing():
 def pemisahan_testing_training(X, y, test_size=0.2, seed=42):
     np.random.seed(seed)
     indices = np.random.permutation(len(X))
-    jumlah_test = int(len(X) * test_size)
+    test_count = int(len(X) * test_size)
     
-    test_index = indices[:jumlah_test]
-    training_index = indices[jumlah_test:]
+    test_idx = indices[:test_count]
+    train_idx = indices[test_count:]
     
-    X_train, X_test = X[training_index], X[test_index]
-    y_train, y_test = y[training_index], y[test_index]
-    
-    return X_train, X_test, y_train, y_test
+    return X[train_idx], X[test_idx], y[train_idx], y[test_idx]
 
-def entropy():
+def entropy(y):
+    label_counts = Counter(y)
+    total = len(y)
+    ent = 0.0
+    for count in label_counts.values():
+        p = count / total
+        ent -= p * math.log2(p)
+    return ent
 
-def information_gain():
+def information_gain(Kolom_X, y, threshold):
+    left_mask = Kolom_X <= threshold
+    right_mask = Kolom_X > threshold
 
-def struktur_tree():
+    entropy_parent = entropy(y)
+    n = len(y)
+    n_left = np.sum(left_mask)
+    n_right = np.sum(right_mask)
 
+    if n_left == 0 or n_right == 0:
+        return 0
+
+    entropy_kiri = entropy(y[left_mask])
+    entropy_kanan = entropy(y[right_mask])
+
+    entropy_final = (n_left / n) * entropy_kiri + (n_right / n) * entropy_kanan
+    return entropy_parent - entropy_final
+
+# def struktur_tree():
 
 def main():
-    # Panggil preprocessing dan ambil data
+    # panggil preprocessing dan ambil data
     X, y = preprocessing()
 
-    # Bagi data
+    # bagi data
     X_train, X_test, y_train, y_test = pemisahan_testing_training(X, y)
 
-    # Tampilkan ukuran data
+    # tampilkan ukuran data
     print("Jumlah data training:", len(X_train))
     print("Jumlah data testing:", len(X_test))
+
+    # cek Information Gain untuk fitur pertama (jam coding) dengan threshold 5.0
+    sample = X_train[:, 0]  # hours_coding
+    test_information_gain = information_gain(sample, y_train, threshold=5.0)
+    print("Information Gain untuk fitur pertama (threshold=5.0):", test_information_gain)
+
 
 if __name__ == "__main__":
     main()
