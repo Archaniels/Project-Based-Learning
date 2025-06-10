@@ -38,6 +38,24 @@ def preprocessing():
     # membaca file dataset .CSV
     df = pd.read_csv(filepath)
 
+    # menampilkan informasi kolom pada dataset
+    print("=================================================================================================================================")
+    print("\nInformasi kolom pada dataset:\n")
+    print(df.columns.tolist())
+    print("\n=================================================================================================================================")
+
+    # menampilkan 5 baris pertama dari dataset
+    print("\n5 baris pertama dari dataset:\n")
+    print(df.head())
+    print("\n=================================================================================================================================")
+
+
+    # menampilkan deskripsi statistik dari dataset
+    pd.set_option('display.max_columns', None)
+    print("\nDeskripsi statistik dari dataset:")
+    print(df.describe())
+    print("\n=================================================================================================================================")
+
     # Memisahkan fitur dan label
     X = df.drop(columns=['task_success'])  # Semua kolom kecuali target
     y = df['task_success']  # Kolom target
@@ -96,7 +114,7 @@ def main():
     X_train, X_test, y_train, y_test = pemisahan_testing_training(X, y)
 
     # tampilkan ukuran data
-    print("Jumlah data training:", len(X_train))
+    print("\nJumlah data training:", len(X_train))
     print("Jumlah data testing:", len(X_test))
 
     # cek Information Gain untuk fitur pertama (jam coding) dengan threshold 5.0
