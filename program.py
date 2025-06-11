@@ -29,11 +29,11 @@ import pandas as pd ## untuk memproses file dataset .CSV
 import numpy as np ## untuk perhitungan
 from collections import Counter
 import math
-import matplotlib.pyplot as plt ## untuk visualisasi data mungkin?
+# import matplotlib.pyplot as plt ## untuk visualisasi data mungkin?
 
 # memproses data (load file, print header, etc.)
 def preprocessing():
-    filepath = r"C:\Users\sxpix\Documents\~~~ CODES\Visual Studio 2022\Project-Based-Learning\ai_dev_productivity.csv"
+    filepath = r"D:\pohon\ai_dev_productivity.csv"
 
     # membaca file dataset .CSV
     df = pd.read_csv(filepath)
@@ -150,6 +150,53 @@ def best_information_gain(X_train, X_test, y_train, y_test):
 
     return ig_hours, ig_coffee, ig_distractions, ig_sleep, ig_commits, ig_bugs, ig_usage, ig_cognitive
 
+def predict_tree(data_input):
+    if data_input['ai_usage_hours'] <= 1.0:
+        if data_input['distractions'] <= 2:
+            return "Success"
+        elif data_input['sleep_hours'] >= 7.5:
+            return "Success"
+        else:
+            return "Fail"
+    else:
+        if data_input['cognitive_load'] <= 4.5 and data_input['sleep_hours'] >= 6.0:
+            return "Success"
+        else:
+            return "Fail"
+
+
+
+# Fungsi untuk meminta input pengguna & uji model manual
+def uji_model():
+    print("\n=== UJI MANUAL MODEL TANPA LIBRARY ===")
+    fitur = ['hours_coding', 'coffee_intake_mg', 'distractions', 'sleep_hours',
+             'commits', 'bugs_reported', 'ai_usage_hours', 'cognitive_load']
+    
+    data_input = {}
+    for f in fitur:
+        val = float(input(f"Masukkan nilai untuk '{f}': "))
+        data_input[f] = val
+
+    hasil = predict_tree(data_input)
+    print(f"\nHasil Prediksi : {hasil}")
+
+
+def evaluate(y_true, y_pred):
+    from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, classification_report
+
+    acc = accuracy_score(y_true, y_pred)
+    prec = precision_score(y_true, y_pred, zero_division=0)
+    rec = recall_score(y_true, y_pred, zero_division=0)
+    f1 = f1_score(y_true, y_pred, zero_division=0)
+
+    print(f"Akurasi     : {acc:.2f}")
+    print(f"Presisi     : {prec:.2f}")
+    print(f"Recall      : {rec:.2f}")
+    print(f"F1-Score    : {f1:.2f}")
+    print("\n=== Classification Report ===")
+    print(classification_report(y_true, y_pred, target_names=["Fail", "Success"]))
+
+
 # def struktur_tree():
 
 def main():
@@ -164,7 +211,30 @@ def main():
     print("Jumlah data training:", len(X_train))
     print("Jumlah data testing:", len(X_test))
 
+    #ig_hours, ig_coffee, ig_distractions, ig_sleep, ig_commits, ig_bugs, ig_usage, ig_cognitive = 
     ig_hours, ig_coffee, ig_distractions, ig_sleep, ig_commits, ig_bugs, ig_usage, ig_cognitive = best_information_gain(X_train, X_test, y_train, y_test)
+
+    # Uji manual prediksi harga
+    uji_model()
+
+    print("\n=== EVALUASI ===")
+    y_pred = []
+    for row in X_test:
+        data_input = {
+            'hours_coding': row[0],
+            'coffee_intake_mg': row[1],
+            'distractions': row[2],
+            'sleep_hours': row[3],
+            'commits': row[4],
+            'bugs_reported': row[5],
+            'ai_usage_hours': row[6],
+            'cognitive_load': row[7]
+        }
+        result = predict_tree(data_input)
+        y_pred.append(1 if result == "Success" else 0)
+
+    evaluate(y_test, y_pred)
+
 
 if __name__ == "__main__":
     main()
