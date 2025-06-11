@@ -182,19 +182,33 @@ def uji_model():
 
 
 def evaluate(y_true, y_pred):
-    from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, classification_report
+    # Hitung komponen confusion matrix
+    tp = sum((yt == 1 and yp == 1) for yt, yp in zip(y_true, y_pred))  # True Positive
+    tn = sum((yt == 0 and yp == 0) for yt, yp in zip(y_true, y_pred))  # True Negative
+    fp = sum((yt == 0 and yp == 1) for yt, yp in zip(y_true, y_pred))  # False Positive
+    fn = sum((yt == 1 and yp == 0) for yt, yp in zip(y_true, y_pred))  # False Negative
 
-    acc = accuracy_score(y_true, y_pred)
-    prec = precision_score(y_true, y_pred, zero_division=0)
-    rec = recall_score(y_true, y_pred, zero_division=0)
-    f1 = f1_score(y_true, y_pred, zero_division=0)
+    total = len(y_true)
+    accuracy = (tp + tn) / total if total > 0 else 0
+    precision = tp / (tp + fp) if (tp + fp) > 0 else 0
+    recall = tp / (tp + fn) if (tp + fn) > 0 else 0
+    f1 = (2 * precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
 
-    print(f"Akurasi     : {acc:.2f}")
-    print(f"Presisi     : {prec:.2f}")
-    print(f"Recall      : {rec:.2f}")
+    # Tampilkan hasil evaluasi
+    print("\n=== EVALUASI ===")
+    print(f"Akurasi     : {accuracy:.2f}")
+    print(f"Presisi     : {precision:.2f}")
+    print(f"Recall      : {recall:.2f}")
     print(f"F1-Score    : {f1:.2f}")
-    print("\n=== Classification Report ===")
-    print(classification_report(y_true, y_pred, target_names=["Fail", "Success"]))
+
+    # Tampilkan confusion matrix
+    print("\n=== CONFUSION MATRIX ===")
+    print("               Predicted")
+    print("                | Fail | Success")
+    print("Actual | Fail   | {:^4} | {:^7}".format(tn, fp))
+    print("       | Success| {:^4} | {:^7}".format(fn, tp))
+
+
 
 
 # def struktur_tree():
@@ -217,7 +231,8 @@ def main():
     # Uji manual prediksi harga
     uji_model()
 
-    print("\n=== EVALUASI ===")
+       # Evaluasi performa model
+    print("\n=== UJI AKURASI ===")
     y_pred = []
     for row in X_test:
         data_input = {
@@ -234,6 +249,7 @@ def main():
         y_pred.append(1 if result == "Success" else 0)
 
     evaluate(y_test, y_pred)
+
 
 
 if __name__ == "__main__":
