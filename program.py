@@ -168,7 +168,7 @@ def predict_tree(data_input):
 
 # Fungsi untuk meminta input pengguna & uji model manual
 def uji_model():
-    print("\n=== UJI MANUAL MODEL TANPA LIBRARY ===")
+    print("\n=== UJI MANUAL MODEL ===")
     fitur = ['hours_coding', 'coffee_intake_mg', 'distractions', 'sleep_hours',
              'commits', 'bugs_reported', 'ai_usage_hours', 'cognitive_load']
     
